@@ -1,0 +1,16 @@
+apiVersion: k3s.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: grafana
+  namespace: kube-system
+spec:
+  chart: stable/grafana
+  targetNamespace: monitoring
+  valuesContent: |-
+    image:
+      tag: master
+    env:
+      GF_EXPLORE_ENABLED: true
+    adminUser: admin
+    adminPassword: NotVerySafePassword
+

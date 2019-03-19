@@ -1,0 +1,45 @@
+---
+- name: install k3s service
+  tags: [ 'service' ]
+  template:
+    src: server.service
+    dest: /etc/systemd/system/k3s.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: reload systemd
+  tags: [ 'reload' ]
+  shell: systemctl daemon-reload
+
+- name: Start k3s service
+  tags: [ 'start' ]
+  service:
+    name: k3s
+    enabled: yes
+    state: started
+
+- name: Wait a while for k3s to init
+  tags: [ 'pause' ]
+  pause:
+    seconds: 30
+
+- name: make /root/.kube dir
+  tags: [ 'kubeconfig' ]
+  file:
+    path: /root/.kube
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: copy kube config
+  tags: [ 'kubeconfig' ]
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /root/.kube/config
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0640
+

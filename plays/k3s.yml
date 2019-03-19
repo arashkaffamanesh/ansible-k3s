@@ -1,0 +1,26 @@
+---
+- hosts: all
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  roles:
+    - { role: aliases, tags: [ aliases ] }
+    - { role: k3s/init, tags: [ init ] }
+
+- hosts: master[0]
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  roles:
+    - { role: k3s/master, tags: [ master ] }
+
+- hosts: all:!master
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  roles:
+    - { role: k3s/node, master_host: "{{ groups['master'][0] }}", tags: [ node ] }
+

@@ -1,0 +1,15 @@
+apiVersion: k3s.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: prometheus-operator
+  namespace: kube-system
+spec:
+  chart: stable/prometheus-operator
+  targetNamespace: monitoring
+  valuesContent: |-
+    alertmanager:
+      enabled: false
+
+    grafana:
+      enabled: false
+

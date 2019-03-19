@@ -1,0 +1,32 @@
+---
+- name: register token
+  shell: cat /var/lib/rancher/k3s/server/node-token
+  register: kube_token
+  delegate_to: "{{ master_host }}"
+  run_once: true
+
+- name: create env file for kubelet
+  copy:
+    dest: /etc/k3s-agent.env
+    content: "NODE_TOKEN={{ kube_token.stdout }}\nSERVER_URL=https://{{ master_public_ip }}:6443\n"
+    owner: root
+    group: root
+    mode: 0640
+
+- name: install k3s agent service
+  tags: [ k3s ]
+  template:
+    src: agent.service
+    dest: /etc/systemd/system/k3s-agent.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: reload systemd
+  shell: systemctl daemon-reload
+
+- name: Start k3s service
+  service:
+    name: k3s-agent
+    enabled: yes
+    state: started

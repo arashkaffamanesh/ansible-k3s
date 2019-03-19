@@ -1,0 +1,24 @@
+---
+- name: copy rbac manifest for helm init
+  copy:
+    src: helm-rbac-config.yaml
+    dest: /tmp/helm-rbac-config.yaml
+  run_once: true
+
+- name: create service account and role binbings for helm
+  shell: k3s kubectl apply -f /tmp/helm-rbac-config.yaml
+  run_once: true
+
+- name: get helm
+  shell: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
+  run_once: true
+
+- name: run helm init
+  shell: helm init --service-account tiller
+  run_once: true
+
+- name: delete rbac manifest for helm init
+  file:
+    path: /tmp/helm-rbac-config.yaml
+    state: absent
+  run_once: true

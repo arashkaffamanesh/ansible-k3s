@@ -1,0 +1,10 @@
+---
+- name: copy manifests for k3s builtin manifest controller
+  with_items: "{{ apps }}"
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/rancher/k3s/server/manifests/
+    owner: root
+    group: root
+    mode: 0644
+

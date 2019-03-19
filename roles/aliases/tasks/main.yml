@@ -1,0 +1,10 @@
+- name: installing systemwide bash aliases and helpful functions
+  tags: [ bash ]
+  with_items: [ env.sh, colors.sh, git_prompt.sh, kubeadm.sh ]
+  copy:
+    src: '{{ item }}'
+    dest: /etc/profile.d/
+    owner: root
+    group: root
+    mode: 0644
+

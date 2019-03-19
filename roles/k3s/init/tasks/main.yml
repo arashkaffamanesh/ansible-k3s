@@ -1,0 +1,42 @@
+---
+- name: install k3s
+  tags: [ binary ]
+  get_url:
+    url: "{{ k3s_binary_url }}"
+    checksum: "{{ k3s_binary_checksum }}"
+    dest: /usr/local/bin/k3s
+    force: yes
+    owner: root
+    group: root
+    mode: 0755
+
+- name: make /opt/cni/bin dir
+  tags: [ cni ]
+  file:
+    path: /opt/cni/bin
+    state: directory
+    owner: root
+    group: root
+
+- name: Download default CNI plugins
+  tags: [ cni ]
+  get_url:
+    url: "{{ cni_plugins_url }}"
+    checksum: "{{ cni_plugins_checksum }}"
+    dest: /tmp/cni.tgz
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install default CNI plugins
+  tags: [ cni ]
+  shell: tar -xzvf /tmp/cni.tgz -C /opt/cni/bin/
+
+- name: copy uninstall script for quick cluster reset
+  tags: [ uninstall ]
+  copy:
+    src: uninstall.sh
+    dest: /root/k3s-uninstall.sh
+    owner: root
+    group: root
+    mode: 0750

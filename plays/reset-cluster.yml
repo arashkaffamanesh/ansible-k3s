@@ -1,0 +1,30 @@
+---
+- hosts: master
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: stop k3s
+      shell: /root/k3s-uninstall.sh
+
+- hosts: all:!master
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: stop k3s
+      shell: K3S_SERVICE_NAME=k3s-agent /root/k3s-uninstall.sh
+
+- hosts: all
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: reboot the node
+      shell: reboot
+
+
+
