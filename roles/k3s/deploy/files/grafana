@@ -13,4 +13,6 @@ spec:
       GF_EXPLORE_ENABLED: true
     adminUser: admin
     adminPassword: NotVerySafePassword
-
+    sidecar:
+      datasources:
+        enabled: true

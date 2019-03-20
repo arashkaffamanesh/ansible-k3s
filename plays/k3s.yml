@@ -5,8 +5,8 @@
     ansible_python_interpreter: /usr/bin/python3
 
   roles:
-    - { role: aliases, tags: [ aliases ] }
-    - { role: k3s/init, tags: [ init ] }
+    - { role: aliases, tags: [ 'aliases', 'common' ] }
+    - { role: k3s/init, tags: [ 'init', 'common' ] }
 
 - hosts: master[0]
   remote_user: root
@@ -15,6 +15,21 @@
 
   roles:
     - { role: k3s/master, tags: [ master ] }
+  tasks:
+    - name: fetch kubeconfig
+      tags: [ 'master', 'kubeconfig' ]
+      fetch:
+        src: /root/.kube/config
+        dest: "../kubeconfig"
+        flat: yes
+
+    - name: replace localhost in kubeconfig with external IP
+      tags: [ 'master', 'kubeconfig' ]
+      replace:
+        path: ../kubeconfig
+        regexp: 'localhost'
+        replace: "{{ master_public_ip }}"
+      delegate_to: 127.0.0.1
 
 - hosts: all:!master
   remote_user: root
