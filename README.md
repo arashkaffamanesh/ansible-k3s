@@ -11,6 +11,7 @@ Table of Contents
     * [Creating the infrastructure](#creating-the-infrastructure)
     * [Running the playbook](#running-the-playbook)
 * [Batteries included](#batteries-included)
+    * [Custom helm repo with s3](#custom-helm-repo-with-s3)
 
 ### Introduction
 
@@ -121,9 +122,21 @@ and [grafana](https://github.com/helm/charts/tree/master/stable/grafana) into mo
 loki and prometheus datasources. The playbook uses builtin k3s deploy controller.  
 `ansible-playbook -i terraform/myNewProject/inventory plays/monitoring.yml`
 
-#### k3s deploy controller helm tricks
+To quickly (and totally insecure, of course) enable access to grafana from outside you can just assign one of droplets
+public IPs to grafana service. Create `patch.yaml` file with the following contents (put the actual IP there):
+```
+spec:
+  externalIPs:
+  - 10.10.10.10
+```
 
-You can't feed a local chart to k3s deploy controller (you can, of course, use `helm template` to generate a bundle of manifests and use that, but it's not always convenient), but you can specify an url of a public helm repo to install a chart from there. So we can do something like this:
+and then patch the grafana service: `kubectl patch -n monitoring svc grafana --patch "$(cat patch.yaml)"`
+
+You can now access grafana from the outside, default creds can be found in the [grafana](role/k3s/deploy/files/grafana) chart.
+
+#### Custom helm repo with s3 
+
+You can't feed a local chart to k3s deploy controller (you can, of course, use `helm template` to generate a bundle of manifests and use that, but it's not always convenient), but you can specify an url of a public helm repo to install a chart from there. And a public helm repo is no more than a bunch of packeged charts plus an `index.yaml` file. To package a chart you can use `helm package` and to create an index you can use `helm repo index`. So we can do something like this:
 
 ```
 git clone https://github.com/grafana/loki.git

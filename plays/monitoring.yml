@@ -1,0 +1,11 @@
+---
+- hosts: master[0]
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  roles:
+    - { role: k3s/deploy, apps: [ 'loki' ], tags: [ 'loki' ] }
+    - { role: k3s/deploy, apps: [ 'prometheus-operator' ], tags: [ 'prometheus' ] }
+    - { role: k3s/deploy, apps: [ 'grafana-datasources.yaml', 'grafana' ], tags: [ 'grafana' ] }
+
