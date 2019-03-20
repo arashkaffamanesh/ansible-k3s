@@ -1,3 +1,4 @@
 *.log
 .terraform
 *.tfstate.backup
+kubeconfig
