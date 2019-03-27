@@ -13,3 +13,10 @@ spec:
     grafana:
       enabled: false
 
+    prometheus:
+      prometheusSpec:
+        retention: 2w
+        serviceMonitorSelector:
+          selector:
+            matchLabels:
+              service: monitor

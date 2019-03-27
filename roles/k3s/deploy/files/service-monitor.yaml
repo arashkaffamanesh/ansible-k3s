@@ -1,0 +1,20 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: general-service-monitor
+  namespace: monitoring
+  labels:
+    service: monitor
+    app: general-service-monitor
+spec:
+  jobLabel: app
+  endpoints:
+  - port: metrics
+    interval: 30s
+  selector:
+    matchLabels:
+      service: metrics
+  namespaceSelector:
+    any: true
+

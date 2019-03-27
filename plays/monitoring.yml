@@ -7,5 +7,6 @@
   roles:
     - { role: k3s/deploy, apps: [ 'loki' ], tags: [ 'loki' ] }
     - { role: k3s/deploy, apps: [ 'prometheus-operator' ], tags: [ 'prometheus' ] }
+    - { role: k3s/deploy, apps: [ 'service-monitor.yaml' ], tags: [ 'prometheus' ] }
     - { role: k3s/deploy, apps: [ 'grafana-datasources.yaml', 'grafana' ], tags: [ 'grafana' ] }
 
