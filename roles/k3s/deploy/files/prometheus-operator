@@ -13,6 +13,9 @@ spec:
     grafana:
       enabled: false
 
+    prometheusOperator:
+      createCustomResource: false
+
     prometheus:
       prometheusSpec:
         retention: 2w

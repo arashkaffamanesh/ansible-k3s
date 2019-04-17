@@ -4,6 +4,13 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
 
+  pre_tasks:
+
+    - name: install prometheus operator crds
+      tags: [ 'crds' ]
+      with_items: [ "alertmanager.crd.yaml", "prometheus.crd.yaml", "prometheusrule.crd.yaml", "servicemonitor.crd.yaml" ]
+      shell: k3s kubectl apply -f "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/{{ item }}"
+
   roles:
     - { role: k3s/deploy, apps: [ 'loki' ], tags: [ 'loki' ] }
     - { role: k3s/deploy, apps: [ 'prometheus-operator' ], tags: [ 'prometheus' ] }
