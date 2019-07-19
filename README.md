@@ -25,24 +25,39 @@ understand k3s specific details.
 
 ### Quick start
 
-1. Clone the repo and go to the root dir: `git clone git@github.com:AnchorFree/ansible-k3s.git k3s && cd k3s`
-1. Make sure you have `secret/devops/cloud_providers/do_hss/do_priv_key` ssh private key from vault set as your default ssh key.
-1. Get your vault token and export it as `TF_VAR_vault_token`.
-1. Create a new infrastructure with terraform: `cd terraform && ./new.bash && cd your-project-name && terraform init && terraform apply`
-1. Deploy the cluster: 
+* Clone the repo and go to the root dir:
+```
+git clone git@github.com:AnchorFree/ansible-k3s.git k3s 
+cd k3s
+```
+* Make sure you have `secret/devops/cloud_providers/do_hss/do_priv_key` ssh private key from vault set as your default ssh key.
+* Get your vault token and export it as `TF_VAR_vault_token`.
+* Create a new infrastructure with terraform: 
+```
+cd terraform 
+./new.bash 
+cd your-project-name 
+terraform init 
+terraform apply
+```
+* Deploy the cluster: 
 ```
 # skip init playbook when in a hurry -- it performs apt upgrade which takes a while
 ansible-playbook -i terraform/your-project-name/inventory plays/init.yml
 ansible-playbook -i terraform/your-project-name/inventory plays/k3s.yml
 ```
-1. You should now have 3 nodes k8s cluster, and `kubeconfig` file locally. Move it to `~/.kube/config` and
-use kubectl as you normally would: `mv kubeconfig ~/.kube/config && kubectl get nodes -o wide` 
-1. If you need helm, run `ansible-playbook -i terraform/your-project-name/inventory plays/helm.yml`, it will install tiller pod in the cluster
+* You should now have 3 nodes k8s cluster, and `kubeconfig` file locally. Move it to `~/.kube/config` and
+use kubectl as you normally would: 
+```
+mv kubeconfig ~/.kube/config
+kubectl get nodes -o wide
+``` 
+* If you need helm, run `ansible-playbook -i terraform/your-project-name/inventory plays/helm.yml`, it will install tiller pod in the cluster
 and helm client on master node.
-1. To "reset" the cluster run `ansible-playbook -i terraform/your-project-name/inventory plays/reset-cluster.yml`. Note that last task of the playbook reboots
+* To **reset** the cluster run `ansible-playbook -i terraform/your-project-name/inventory plays/reset-cluster.yml`. Note that last task of the playbook reboots
 all the nodes, so expect it to fail in the end. Then run `ansible-playbook -i terraform/sample/inventory plays/k3s.yml` to 
 create a new cluster.
-1. Don't forget to destroy your env when you are done: `cd terraform/your-project-name && terraform destroy`.
+* Don't forget to destroy your env when you are done: `cd terraform/your-project-name && terraform destroy`.
 
 ### Usage
 
