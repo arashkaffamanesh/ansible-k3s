@@ -119,7 +119,7 @@ ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml
 Deploys [rook](https://rook.io) and configures `ceph` cluster. After install you will have a `rook-ceph-block` storage class which can be 
 used by apps that require persistent storage.
 ```
-ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml
+ansible-playbook -i terraform/your-project-name/inventory plays/storage.yml
 ```
 
 ### Custom helm repo with s3 
