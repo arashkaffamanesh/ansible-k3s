@@ -9,7 +9,7 @@ Table of Contents
     * [Notes on k3s specifics](#notes-on-k3s-specifics)
     * [Playbook defaults](#playbook-defaults)
 * [Batteries included](#batteries-included)
-    * [Custom helm repo with s3](#custom-helm-repo-with-s3)
+* [Custom helm repo with s3](#custom-helm-repo-with-s3)
 
 ### Introduction
 
@@ -31,13 +31,13 @@ understand k3s specific details.
 1. Create a new infrastructure with terraform: `cd terraform && ./new.bash && cd your-project-name && terraform init && terraform apply`
 1. Deploy the cluster: 
 ```
+# skip init playbook when in a hurry -- it performs apt upgrade which takes a while
 ansible-playbook -i terraform/your-project-name/inventory plays/init.yml
 ansible-playbook -i terraform/your-project-name/inventory plays/k3s.yml
 ```
-If you are in a hurry, you can skip the `init` playbook, it does `apt-get update && apt-get upgrade` which takes a while.
 1. You should now have 3 nodes k8s cluster, and `kubeconfig` file locally. Move it to `~/.kube/config` and
 use kubectl as you normally would: `mv kubeconfig ~/.kube/config && kubectl get nodes -o wide` 
-1. If you need helm, run `ansible-playbook -terraform/sample/inventory plays/helm.yml`, it will install tiller pod in the cluster
+1. If you need helm, run `ansible-playbook -i terraform/your-project-name/inventory plays/helm.yml`, it will install tiller pod in the cluster
 and helm client on master node.
 1. To "reset" the cluster run `ansible-playbook -i terraform/your-project-name/inventory plays/reset-cluster.yml`. Note that last task of the playbook reboots
 all the nodes, so expect it to fail in the end. Then run `ansible-playbook -i terraform/sample/inventory plays/k3s.yml` to 
@@ -89,17 +89,19 @@ There are a couple of additional playbooks included:
 
 * [helm](plays/helm.yml)  
 Installs helm server part (with RBAC) in the cluster and helm client on the master node.  
-`ansible-playbook -i terraform/myNewProject/inventory plays/helm.yml`
+`ansible-playbook -i terraform/your-project-name/inventory plays/helm.yml`
 
 * [monitoring](plays/monitoring.yml)  
 Installs [loki](https://github.com/grafana/loki) and [prometheus-operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
 with [grafana](https://github.com/helm/charts/tree/master/stable/grafana) enabled into monitoring namespace of your cluster. The playbook uses builtin k3s deploy controller.  
-`ansible-playbook -i terraform/myNewProject/inventory plays/monitoring.yml`
+`ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml`
 
-* [storage](plays/storage.yml) Deploys [rook](https://rook.io) and configures `ceph` cluster. After install you will have a `rook-ceph-block` storage class which
+* [storage](plays/storage.yml)  
+Deploys [rook](https://rook.io) and configures `ceph` cluster. After install you will have a `rook-ceph-block` storage class which
 can be used by apps thet require persistent storage.
+`ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml`
 
-#### Custom helm repo with s3 
+### Custom helm repo with s3 
 
 You can't feed a local chart to k3s deploy controller (you can, of course, use `helm template` to generate a bundle of manifests and use that, but it's not always convenient), but you can specify an url of a public helm repo to install a chart from there. And a public helm repo is no more than a bunch of packeged charts plus an `index.yaml` file. To package a chart you can use `helm package` and to create an index you can use `helm repo index`. So we can do something like this:
 
