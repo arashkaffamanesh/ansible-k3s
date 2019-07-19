@@ -1,0 +1,23 @@
+---
+- hosts: all
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  pre_tasks:
+
+    - name: update apt cache
+      tags: [ 'apt', 'update' ]
+      apt: update_cache=yes
+
+    - name: upgrade apt packages
+      tags: [ 'apt', 'upgrade' ]
+      apt: upgrade=yes
+
+  roles:
+    - { role: aliases, tags: [ 'aliases', 'common' ] }
+
+  post_tasks:
+    - name: Reboot the node
+      tags: [ 'reboot' ]
+      command: reboot

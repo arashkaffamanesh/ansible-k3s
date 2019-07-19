@@ -1,0 +1,20 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: cert-issuer
+  namespace: {{ certmanager_namespace }}
+spec:
+  acme:
+    email: it@deviant.guru
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: cluster-issuer-account-key
+    dns01:
+      providers:
+      - name: acme
+        acmedns:
+          host: {{ acmedns_url }}
+          accountSecretRef:
+            name: acme-dns
+            key: acmedns.json
+

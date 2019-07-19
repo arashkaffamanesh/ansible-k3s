@@ -1,0 +1,32 @@
+---
+- name: Create /root/weave dir
+  file:
+    path: /root/weave
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: Create file with weave password
+  copy:
+    dest: /root/weave/weave-passwd
+    content: "${weave_password}"
+    owner: root
+    group: root
+    mode: 0640
+
+- name: Create secret for weave
+  shell: k3s kubectl create secret -n kube-system generic weave-passwd --from-file=/root/weave/weave-passwd
+  run_once: true
+
+- name: Copy weave daemonset manifest
+  copy:
+    src: all.yaml
+    dest: /root/weave/all.yaml
+    owner: root
+    group: root
+
+- name: Create weave daemonset
+  shell: k3s kubectl create -f /root/weave/all.yaml
+  run_once: true
+

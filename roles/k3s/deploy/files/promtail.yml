@@ -1,0 +1,9 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: promtail
+  namespace: kube-system
+spec:
+  chart: promtail
+  repo: https://deviantguru.s3.amazonaws.com/helm
+  targetNamespace: monitoring

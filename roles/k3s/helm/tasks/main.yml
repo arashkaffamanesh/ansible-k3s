@@ -5,7 +5,7 @@
     dest: /tmp/helm-rbac-config.yaml
   run_once: true
 
-- name: create service account and role binbings for helm
+- name: create service account and role bindings for helm
   shell: k3s kubectl apply -f /tmp/helm-rbac-config.yaml
   run_once: true
 

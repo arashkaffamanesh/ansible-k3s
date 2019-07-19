@@ -1,0 +1,21 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: wildcard-deviant
+  namespace: {{ certmanager_namespace }}
+spec:
+  secretName: wildcard-deviant-tls
+  issuerRef:
+    name: cert-issuer
+    kind: ClusterIssuer
+  dnsNames:
+  - deviant.guru
+  - '*.deviant.guru'
+  acme:
+    config:
+    - dns01:
+        provider: acme
+      domains:
+      - deviant.guru
+      - '*.deviant.guru'
+

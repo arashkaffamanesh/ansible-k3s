@@ -1,0 +1,5 @@
+deploy_pause: 90
+certmanager_namespace: cert-manager
+certmanager_version: 0.8.1
+certmanager_version_short: 0.8
+acmedns_url: "http://acmedns-api.dns.svc.cluster.local"

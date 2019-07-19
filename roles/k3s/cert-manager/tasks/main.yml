@@ -1,0 +1,54 @@
+---
+- name: make /root/cert-manager dir
+  tags: [ configs ]
+  file:
+    path: /root/cert-manager
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: copy cert-manager configs
+  tags: [ configs ]
+  with_items: [ acme-secret.yaml, issuer.yaml, certificate.yaml ]
+  template:
+    src: "{{ item }}"
+    dest: /root/cert-manager/
+    owner: root
+    group: root
+    mode: 0640
+
+- name: create cert-manager CRDs
+  tags: [ crds ]
+  shell: k3s kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-{{certmanager_version_short}}/deploy/manifests/00-crds.yaml
+
+- name: label cert-manager namespace
+  tags: [ label ]
+  shell: k3s kubectl label namespace {{ certmanager_namespace }} certmanager.k8s.io/disable-validation=true
+
+- name: create acme secret
+  tags: [ secret ]
+  shell: k3s kubectl create -f /root/cert-manager/acme-secret.yaml
+
+- name: copy cert-manager helm resource
+  tags: [ helm ]
+  template:
+    src: cert-manager.yml
+    dest: /var/lib/rancher/k3s/server/manifests/
+    owner: root
+    group: root
+    mode: 0640
+
+- name: Wait a while for cert-manager to be installed
+  tags: [ 'pause' ]
+  pause:
+    seconds: "{{ deploy_pause }}"
+
+- name: create ClusterIssuer
+  tags: [ issuer ]
+  shell: k3s kubectl create -f /root/cert-manager/issuer.yaml
+
+- name: create certificate order
+  tags: [ order ]
+  shell: k3s kubectl create -f /root/cert-manager/certificate.yaml
+

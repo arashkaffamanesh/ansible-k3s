@@ -1,0 +1,10 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: loki
+  namespace: kube-system
+spec:
+  chart: loki
+  version: 0.10.0
+  repo: https://deviantguru.s3.amazonaws.com/helm
+  targetNamespace: monitoring

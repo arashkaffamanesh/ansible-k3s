@@ -1,0 +1,10 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: ceph-cluster
+  namespace: kube-system
+spec:
+  chart: ceph-cluster-dir
+  version: 0.0.6
+  repo: https://deviantguru.s3.amazonaws.com/helm
+  targetNamespace: rook-ceph

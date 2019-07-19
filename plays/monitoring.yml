@@ -4,6 +4,21 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
 
+  roles:
+    - { role: k3s/deploy, apps: [ 'metrics-server.yml' ], tags: [ 'metrics' ] }
+    - { role: k3s/deploy, apps: [ 'loki.yml' ], tags: [ 'loki', 'logs' ] }
+
+  post_tasks:
+    - name: Wait a while for loki to be installed
+      tags: [ 'pause' ]
+      pause:
+        seconds: 90
+
+- hosts: master[0]
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
   pre_tasks:
 
     - name: install prometheus operator crds
@@ -12,8 +27,6 @@
       shell: k3s kubectl apply -f "https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/{{ item }}"
 
   roles:
-    - { role: k3s/deploy, apps: [ 'loki' ], tags: [ 'loki' ] }
-    - { role: k3s/deploy, apps: [ 'prometheus-operator' ], tags: [ 'prometheus' ] }
-    - { role: k3s/deploy, apps: [ 'service-monitor.yaml' ], tags: [ 'prometheus' ] }
-    - { role: k3s/deploy, apps: [ 'grafana-datasources.yaml', 'grafana' ], tags: [ 'grafana' ] }
-
+    - { role: k3s/deploy, apps: [ 'promtail.yml' ], tags: [ 'logs', 'promtail' ] }
+    - { role: k3s/deploy, apps: [ 'prometheus-operator.yml' ], tags: [ 'prometheus' ] }
+    - { role: k3s/deploy, apps: [ 'service-monitor.yml' ], tags: [ 'prometheus' ] }

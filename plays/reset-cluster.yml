@@ -23,6 +23,8 @@
     ansible_python_interpreter: /usr/bin/python3
 
   tasks:
+    - name: clean rook
+      shell: rm -rf /var/lib/rook/*
     - name: reboot the node
       shell: reboot
 

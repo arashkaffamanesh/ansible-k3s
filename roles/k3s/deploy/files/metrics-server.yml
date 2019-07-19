@@ -1,0 +1,8 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: kube-metrics-server
+  namespace: kube-system
+spec:
+  chart: stable/metrics-server
+  targetNamespace: kube-system

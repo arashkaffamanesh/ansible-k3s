@@ -8,8 +8,6 @@ Table of Contents
 * [Usage](#usage)
     * [Notes on k3s specifics](#notes-on-k3s-specifics)
     * [Playbook defaults](#playbook-defaults)
-    * [Creating the infrastructure](#creating-the-infrastructure)
-    * [Running the playbook](#running-the-playbook)
 * [Batteries included](#batteries-included)
     * [Custom helm repo with s3](#custom-helm-repo-with-s3)
 
@@ -30,16 +28,21 @@ understand k3s specific details.
 1. Clone the repo and go to the root dir: `git clone git@github.com:AnchorFree/ansible-k3s.git k3s && cd k3s`
 1. Make sure you have `secret/devops/cloud_providers/do_hss/do_priv_key` ssh private key from vault set as your default ssh key.
 1. Get your vault token and export it as `TF_VAR_vault_token`.
-1. Create infrastructure with terraform: `cd terraform/sample && terraform init && terraform apply`
-1. Run the playbook: `cd ../..; ansible-playbook -i terraform/sample/inventory plays/k3s.yml`
+1. Create a new infrastructure with terraform: `cd terraform && ./new.bash && cd your-project-name && terraform init && terraform apply`
+1. Deploy the cluster: 
+```
+ansible-playbook -i terraform/your-project-name/inventory plays/init.yml
+ansible-playbook -i terraform/your-project-name/inventory plays/k3s.yml
+```
+If you are in a hurry, you can skip the `init` playbook, it does `apt-get update && apt-get upgrade` which takes a while.
 1. You should now have 3 nodes k8s cluster, and `kubeconfig` file locally. Move it to `~/.kube/config` and
 use kubectl as you normally would: `mv kubeconfig ~/.kube/config && kubectl get nodes -o wide` 
 1. If you need helm, run `ansible-playbook -terraform/sample/inventory plays/helm.yml`, it will install tiller pod in the cluster
 and helm client on master node.
-1. To "reset" the cluster run `ansible-playbook -terraform/sample/inventory plays/reset-cluster.yml`. Note that last task of the playbook reboots
-all the nodes, so expect it to fail in the end. Then run `ansible-playbook -i terraform/sample/inventory plays/k3s.yml -t master,node` to 
+1. To "reset" the cluster run `ansible-playbook -i terraform/your-project-name/inventory plays/reset-cluster.yml`. Note that last task of the playbook reboots
+all the nodes, so expect it to fail in the end. Then run `ansible-playbook -i terraform/sample/inventory plays/k3s.yml` to 
 create a new cluster.
-1. Don't forget to destroy your env when you are done: `cd terraform/sample && terraform destroy`.
+1. Don't forget to destroy your env when you are done: `cd terraform/your-project-name && terraform destroy`.
 
 ### Usage
 
@@ -55,7 +58,7 @@ k3s uses [containerd](https://containerd.io/) (already integrated into k3s binar
 1. To operate running containers on a node you need to use `k3s crictl ...` instead of `docker ...`
 
 k3s has a builtin deploy controller. It scans `/var/lib/rancher/k3s/server/manifests/` directory on master node,
-and tries to deploy [manifests](roles/k3s/deploy/files/grafana-datasources.yaml) and [helm charts](roles/k3s/deploy/files/grafana) found
+and tries to deploy [helm charts](roles/k3s/deploy/files/prometheus-operator.yaml) and manifests found
 there. 
 
 #### Playbook defaults
@@ -78,35 +81,7 @@ k3s deploys [traefik](https://github.com/containous/traefik) by default as a sim
 This playbook disables the default traefik deployment. If you want to use it, override `k3s_server_extra_args` and remove
 `--no-deploy=traefik` part.
 
-The playbook installs a bunch of helpful bash [aliases](roles/aliases/files/kubeadm.sh) on cluster nodes:
-```
-alias kubectl=`k3s kubectl`
-alias ktl=`k3s kubectl`
-alias crictl=`k3s crictl`
-```
-
-#### Creating new infrastructure
-
-There are [sample](terraform/sample) terraform configs for creating droplets in DO and generating ansible inventory.
-When starting new project you can use that as a basis:
-
-1. Copy sample configs: `cp -r terraform/sample terrafom/myNewProject && cd terraform/myNewProject`.
-1. Adjust values to your needs. Main candidates: `name`, `nodes`, `region`, `node_size` (default is **s-2vcpu-4gb**).
-1. Get your vault token and export it as `TF_VAR_vault_token`.
-1. `terraform init && terraform plan && terraform apply`.
-1. You are ready to run the playbook. Go back to the root dir: `cd ../..`
-
-#### Running the playbook
-
-* The whole playbook from scratch: `ansible-playbook -i terraform/myNewProject/inventory plays/k3s.yml`
-* Only master part: `ansible-playbook -i terraform/myNewProject/inventory plays/k3s.yml -t master`
-* Only nodes part: `ansible-playbook -i terraform/myNewProject/inventory plays/k3s.yml -t node`
-* Destroying and recreating the cluster:  
-```
-ansible-playbook -i terraform/myNewProject/inventory plays/reset-cluster.yml
-sleep 30
-ansible-playbook -i terraform/myNewProject/inventory plays/k3s.yml -t master,node
-```
+The playbook installs a bunch of helpful bash [aliases](roles/aliases/files/kubeadm.sh) on cluster nodes.
 
 ### Batteries included
 
@@ -117,22 +92,12 @@ Installs helm server part (with RBAC) in the cluster and helm client on the mast
 `ansible-playbook -i terraform/myNewProject/inventory plays/helm.yml`
 
 * [monitoring](plays/monitoring.yml)  
-Installs [loki](https://github.com/grafana/loki), [prometheus-operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
-and [grafana](https://github.com/helm/charts/tree/master/stable/grafana) into monitoring namespace of your cluster. Grafana comes preconfigured with
-loki and prometheus datasources. The playbook uses builtin k3s deploy controller.  
+Installs [loki](https://github.com/grafana/loki) and [prometheus-operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
+with [grafana](https://github.com/helm/charts/tree/master/stable/grafana) enabled into monitoring namespace of your cluster. The playbook uses builtin k3s deploy controller.  
 `ansible-playbook -i terraform/myNewProject/inventory plays/monitoring.yml`
 
-To quickly (and totally insecure, of course) enable access to grafana from outside you can just assign one of droplets
-public IPs to grafana service. Create `patch.yaml` file with the following contents (put the actual IP there):
-```
-spec:
-  externalIPs:
-  - 10.10.10.10
-```
-
-and then patch the grafana service: `kubectl patch -n monitoring svc grafana --patch "$(cat patch.yaml)"`
-
-You can now access grafana from the outside, default creds can be found in the [grafana](role/k3s/deploy/files/grafana) chart.
+* [storage](plays/storage.yml) Deploys [rook](https://rook.io) and configures `ceph` cluster. After install you will have a `rook-ceph-block` storage class which
+can be used by apps thet require persistent storage.
 
 #### Custom helm repo with s3 
 

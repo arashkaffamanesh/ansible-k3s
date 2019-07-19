@@ -1,0 +1,8 @@
+---
+- hosts: master[0]
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  roles:
+    - { role: k3s/cert-manager, certmanager_namespace: 'dns', tags: [ 'cert-manager' ] }

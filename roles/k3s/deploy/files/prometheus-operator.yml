@@ -1,4 +1,4 @@
-apiVersion: k3s.cattle.io/v1
+apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: prometheus-operator
@@ -11,7 +11,13 @@ spec:
       enabled: false
 
     grafana:
-      enabled: false
+      enabled: true
+      image:
+        tag: master
+      env:
+        GF_EXPLORE_ENABLED: true
+      adminUser: admin
+      adminPassword: R_M_S4evR
 
     prometheusOperator:
       createCustomResource: false
