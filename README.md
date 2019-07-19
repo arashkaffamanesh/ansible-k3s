@@ -104,17 +104,23 @@ There are a couple of additional playbooks included:
 
 * [helm](plays/helm.yml)  
 Installs helm server part (with RBAC) in the cluster and helm client on the master node.  
-`ansible-playbook -i terraform/your-project-name/inventory plays/helm.yml`
+```
+ansible-playbook -i terraform/your-project-name/inventory plays/helm.yml
+```
 
 * [monitoring](plays/monitoring.yml)  
 Installs [loki](https://github.com/grafana/loki) and [prometheus-operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
 with [grafana](https://github.com/helm/charts/tree/master/stable/grafana) enabled into monitoring namespace of your cluster. The playbook uses builtin k3s deploy controller.  
-`ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml`
+```
+ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml
+```
 
 * [storage](plays/storage.yml)  
-Deploys [rook](https://rook.io) and configures `ceph` cluster. After install you will have a `rook-ceph-block` storage class which
-can be used by apps thet require persistent storage.
-`ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml`
+Deploys [rook](https://rook.io) and configures `ceph` cluster. After install you will have a `rook-ceph-block` storage class which can be 
+used by apps that require persistent storage.
+```
+ansible-playbook -i terraform/your-project-name/inventory plays/monitoring.yml
+```
 
 ### Custom helm repo with s3 
 
