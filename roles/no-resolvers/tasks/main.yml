@@ -1,0 +1,12 @@
+---
+- name: disable and stop systemd-resolved
+  service:
+    name: systemd-resolved
+    enabled: no
+    state: stopped
+
+- name: fill in /etc/resolv.conf
+  copy:
+    dest: /etc/resolv.conf
+    content: "nameserver 1.1.1.1\n"
+

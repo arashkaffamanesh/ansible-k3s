@@ -1,6 +1,6 @@
 cni_plugins_version: 0.7.5
 cni_plugins_url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-amd64-v{{ cni_plugins_version }}.tgz"
 cni_plugins_checksum: "sha256:https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-amd64-v{{ cni_plugins_version }}.tgz.sha256"
-k3s_version: 0.6.1
+k3s_version: 0.7.0
 k3s_binary_url: "https://github.com/rancher/k3s/releases/download/v{{ k3s_version }}/k3s"
-k3s_binary_checksum: "sha256:df7ff885145cf58a8c32e5c7b66eb2659708d433f360e36b59350c431bf81e46"
+k3s_binary_checksum: "sha256:b838785f81f4a8c7e4564769c4deae391439d6782170f6a03bee742dd39c4d3c"

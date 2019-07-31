@@ -17,7 +17,7 @@ region=$(ask "nyc1")
 echo -n "Nodes (default: 3): "
 nodes=$(ask 3)
 
-echo -n "Name (default: deviant): "
+echo -n "Name (default: k3s-sample-cluster): "
 name=$(ask "k3s-sample-cluster")
 
 mkdir "${name}-${env}-${region}"; cd "${name}-${env}-${region}"

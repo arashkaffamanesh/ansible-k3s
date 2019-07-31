@@ -16,6 +16,7 @@
 
   roles:
     - { role: aliases, tags: [ 'aliases', 'common' ] }
+    - { role: no-resolvers, tags: [ 'dns', 'common' ] }
 
   post_tasks:
     - name: Reboot the node
