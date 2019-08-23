@@ -30,6 +30,14 @@
         replace: "{{ master_public_ip }}"
       delegate_to: 127.0.0.1
 
+- hosts: master[0]
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  roles:
+    - { role: k3s/deploy, apps: [ 'metrics-server.yml' ], tags: [ 'metrics' ] }
+
 - hosts: all:!master
   remote_user: root
   vars:
